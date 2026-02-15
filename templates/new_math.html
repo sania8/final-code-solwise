@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Math Solver</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* LEFT PANEL - Input & Controls */
+        .left-panel {
+            width: 45%;
+            background: white;
+            overflow-y: auto;
+            box-shadow: 4px 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .controls-section {
+            padding: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 1em;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .section-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #667eea;
+            margin: 20px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button .icon {
+            font-size: 1.2em;
+        }
+
+        /* Core Actions */
+        .btn-solve { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .btn-explain { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        
+        /* Learning */
+        .btn-alternative { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-practice { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .btn-mistakes { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .btn-tutor { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        
+        /* Understanding */
+        .btn-realworld { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .btn-eli5 { background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); color: #333; }
+        .btn-difficulty { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #333; }
+        
+        /* Advanced */
+        .btn-ladder { background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%); color: #333; }
+        .btn-concept { background: linear-gradient(135deg, #fdcbf1 0%, #e6dee9 100%); color: #333; }
+        .btn-worksheet { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #333; }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .file-upload {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .file-upload h3 {
+            font-size: 0.95em;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.85em;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            background: #764ba2;
+        }
+
+        .file-name {
+            margin-left: 10px;
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        /* RIGHT PANEL - Results */
+        .right-panel {
+            width: 55%;
+            background: #f8f9fa;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .result-container {
+            padding: 30px;
+            min-height: 100%;
+        }
+
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            color: #666;
+        }
+
+        .welcome-screen .icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .welcome-screen h2 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .result-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            margin-right: 15px;
+        }
+
+        .result-title h3 {
+            color: #333;
+            font-size: 1.4em;
+            margin-bottom: 5px;
+        }
+
+        .result-title p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .result-content {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            line-height: 1.8;
+            color: #333;
+            white-space: pre-wrap;
+            max-height: calc(100vh - 250px);
+            overflow-y: auto;
+        }
+
+        /* Interactive Features */
+        .interactive-box {
+            margin-top: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border-radius: 10px;
+            border: 2px solid #667eea30;
+        }
+
+        .interactive-box h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .progress-tracker {
+            margin-top: 15px;
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .progress-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .progress-item .step-number {
+            width: 30px;
+            height: 30px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+            font-size: 0.9em;
+        }
+
+        .progress-item .step-content {
+            flex: 1;
+        }
+
+        .progress-item .step-title {
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .progress-item .step-desc {
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 3px;
+        }
+
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-card .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.8em;
+            color: #666;
+        }
+
+        .highlight-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 5px;
+        }
+
+        .highlight-box strong {
+            color: #856404;
+        }
+
+        .tip-box {
+            margin-top: 15px;
+            padding: 15px;
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            border-radius: 5px;
+        }
+
+        .tip-box strong {
+            color: #0c5460;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid #f5c6cb;
+        }
+
+        /* Collapsible sections */
+        .collapsible {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.3s;
+        }
+
+        .collapsible:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding-top: 0;
+        }
+
+        .collapsible-content.active {
+            max-height: 500px;
+            padding-top: 15px;
+            border-top: 1px solid #e0e0e0;
+            margin-top: 15px;
+        }
+
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+
+        .toggle-icon.active {
+            transform: rotate(180deg);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .left-panel, .right-panel {
+                width: 100%;
+                height: auto;
+            }
+            
+            .left-panel {
+                max-height: 50vh;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="header">
+                <h1>🧮 Math Solver Pro</h1>
+                <p>Complete Learning Platform</p>
+            </div>
+
+            <div class="controls-section">
+                <div class="input-group">
+                    <label for="question">📝 Enter your math question:</label>
+                    <textarea 
+                        id="question" 
+                        rows="3" 
+                        placeholder="E.g., Solve x² + 5x + 6 = 0"
+                    ></textarea>
+                </div>
+
+                <div class="section-title">⚡ Quick Actions</div>
+                <div class="button-grid">
+                    <button class="btn-solve" onclick="submitQuestion('solve')">
+                        <span class="icon">🎯</span>
+                        <span>Solve</span>
+                    </button>
+                    <button class="btn-explain" onclick="submitQuestion('explain')">
+                        <span class="icon">📖</span>
+                        <span>Explain</span>
+                    </button>
+                </div>
+
+                <div class="section-title">🎓 Learning</div>
+                <div class="button-grid">
+                    <button class="btn-alternative" onclick="submitQuestion('alternative_methods')">
+                        <span class="icon">🔄</span>
+                        <span>Alt Methods</span>
+                    </button>
+                    <button class="btn-practice" onclick="submitQuestion('practice_similar')">
+                        <span class="icon">💪</span>
+                        <span>Practice</span>
+                    </button>
+                    <button class="btn-mistakes" onclick="submitQuestion('common_mistakes')">
+                        <span class="icon">⚠️</span>
+                        <span>Mistakes</span>
+                    </button>
+                    <button class="btn-tutor" onclick="submitQuestion('tutor_mode')">
+                        <span class="icon">👨‍🏫</span>
+                        <span>Tutor</span>
+                    </button>
+                </div>
+
+                <div class="section-title">🌍 Context</div>
+                <div class="button-grid">
+                    <button class="btn-realworld" onclick="submitQuestion('real_world')">
+                        <span class="icon">🌎</span>
+                        <span>Real Uses</span>
+                    </button>
+                    <button class="btn-eli5" onclick="submitQuestion('eli5')">
+                        <span class="icon">🧒</span>
+                        <span>ELI5</span>
+                    </button>
+                    <button class="btn-difficulty" onclick="submitQuestion('difficulty_rating')">
+                        <span class="icon">📊</span>
+                        <span>Difficulty</span>
+                    </button>
+                </div>
+
+                <div class="section-title">🚀 Advanced</div>
+                <div class="button-grid">
+                    <button class="btn-ladder" onclick="submitQuestion('difficulty_ladder')">
+                        <span class="icon">🪜</span>
+                        <span>Ladder</span>
+                    </button>
+                    <button class="btn-concept" onclick="submitQuestion('concept_map')">
+                        <span class="icon">🗺️</span>
+                        <span>Concepts</span>
+                    </button>
+                    <button class="btn-worksheet" onclick="submitQuestion('worksheet')">
+                        <span class="icon">📝</span>
+                        <span>Worksheet</span>
+                    </button>
+                </div>
+
+                <div class="file-upload">
+                    <h3>📁 Upload Document</h3>
+                    <label for="file-input" class="file-label">Choose File</label>
+                    <span class="file-name" id="file-name">No file</span>
+                    <input type="file" id="file-input" accept=".pdf,.docx,.pptx" onchange="uploadFile()">
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <div class="result-container">
+                <!-- Welcome Screen -->
+                <div class="welcome-screen" id="welcome-screen">
+                    <div class="icon">🎓</div>
+                    <h2>Ready to Learn!</h2>
+                    <p>Enter a math problem and choose an action to get started</p>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Processing your request...</p>
+                </div>
+
+                <!-- Results Section -->
+                <div id="result-section" style="display: none;">
+                    <div class="result-header">
+                        <div class="result-icon" id="result-icon">✓</div>
+                        <div class="result-title">
+                            <h3 id="result-title">Solution</h3>
+                            <p id="result-subtitle">Answer generated</p>
+                        </div>
+                    </div>
+
+                    <div class="result-content" id="result"></div>
+
+                    <!-- Interactive Features -->
+                    <div class="interactive-box" id="interactive-features" style="display: none;">
+                        <h4>📌 Key Insights</h4>
+                        <div id="interactive-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function submitQuestion(action) {
+            const question = document.getElementById('question').value.trim();
+            
+            if (!question) {
+                alert('Please enter a math question');
+                return;
+            }
+
+            // Hide welcome, show loading
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('loading').classList.add('show');
+            document.getElementById('result-section').style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('question', question);
+            formData.append('action', action);
+
+            fetch('/solve', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').classList.remove('show');
+                
+                if (data.error) {
+                    showError(data.error);
+                } else {
+                    showResult(data.result, action);
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').classList.remove('show');
+                showError('An error occurred: ' + error.message);
+            });
+        }
+
+        function showResult(text, action) {
+            document.getElementById('result-section').style.display = 'block';
+            
+            // Update header based on action
+            const icons = {
+                'solve': '🎯',
+                'explain': '📖',
+                'alternative_methods': '🔄',
+                'practice_similar': '💪',
+                'common_mistakes': '⚠️',
+                'tutor_mode': '👨‍🏫',
+                'real_world': '🌎',
+                'eli5': '🧒',
+                'difficulty_rating': '📊',
+                'difficulty_ladder': '🪜',
+                'concept_map': '🗺️',
+                'worksheet': '📝'
+            };
+            
+            const titles = {
+                'solve': 'Solution',
+                'explain': 'Step-by-Step Explanation',
+                'alternative_methods': 'Alternative Methods',
+                'practice_similar': 'Practice Problems',
+                'common_mistakes': 'Common Mistakes',
+                'tutor_mode': 'Tutor Hints',
+                'real_world': 'Real-World Applications',
+                'eli5': 'Simple Explanation',
+                'difficulty_rating': 'Difficulty Analysis',
+                'difficulty_ladder': 'Difficulty Ladder',
+                'concept_map': 'Concept Map',
+                'worksheet': 'Practice Worksheet'
+            };
+            
+            document.getElementById('result-icon').textContent = icons[action] || '✓';
+            document.getElementById('result-title').textContent = titles[action] || 'Result';
+            document.getElementById('result-subtitle').textContent = 'Generated successfully';
+            document.getElementById('result').innerHTML = formatResult(text);
+            
+            // Add interactive features
+            addInteractiveFeatures(action, text);
+        }
+
+        function formatResult(text) {
+            // Convert plain text to HTML with better formatting
+            return text
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/__(.*?)__/g, '<strong>$1</strong>');
+        }
+
+        function addInteractiveFeatures(action, text) {
+            const container = document.getElementById('interactive-content');
+            const box = document.getElementById('interactive-features');
+            
+            // Extract numbers or steps from the result
+            const numbers = text.match(/\d+/g) || [];
+            const lines = text.split('\n').filter(line => line.trim());
+            
+            let interactiveHTML = '';
+            
+            // Different interactive features based on action
+            if (action === 'explain' && lines.length > 3) {
+                interactiveHTML = '<div class="progress-tracker">';
+                lines.slice(0, Math.min(5, lines.length)).forEach((line, idx) => {
+                    if (line.length > 10) {
+                        interactiveHTML += `
+                            <div class="progress-item" onclick="highlightStep(${idx})">
+                                <div class="step-number">${idx + 1}</div>
+                                <div class="step-content">
+                                    <div class="step-title">${line.substring(0, 50)}${line.length > 50 ? '...' : ''}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                interactiveHTML += '</div>';
+                
+            } else if (action === 'difficulty_rating' && numbers.length > 0) {
+                interactiveHTML = '<div class="quick-stats">';
+                interactiveHTML += `
+                    <div class="stat-card">
+                        <div class="stat-value">${numbers[0] || '?'}</div>
+                        <div class="stat-label">Difficulty</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${numbers[1] || '?'}</div>
+                        <div class="stat-label">Grade Level</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">${numbers[2] || '?'}m</div>
+                        <div class="stat-label">Time Est.</div>
+                    </div>
+                `;
+                interactiveHTML += '</div>';
+                
+            } else if (action === 'practice_similar') {
+                interactiveHTML = '<div class="tip-box"><strong>💡 Tip:</strong> Try solving these without looking at the answers first!</div>';
+                
+            } else if (action === 'common_mistakes') {
+                interactiveHTML = '<div class="highlight-box"><strong>⚠️ Remember:</strong> These are the most common errors students make. Review carefully!</div>';
+                
+            } else if (action === 'tutor_mode') {
+                interactiveHTML = '<div class="tip-box"><strong>🎯 Challenge:</strong> Try solving the problem yourself using these hints before looking at the full solution!</div>';
+            }
+            
+            if (interactiveHTML) {
+                container.innerHTML = interactiveHTML;
+                box.style.display = 'block';
+            } else {
+                box.style.display = 'none';
+            }
+        }
+
+        function highlightStep(idx) {
+            // Could add animation or highlighting
+            console.log('Step', idx + 1, 'clicked');
+        }
+
+        function showError(message) {
+            document.getElementById('result-section').style.display = 'block';
+            document.getElementById('result-icon').textContent = '❌';
+            document.getElementById('result-title').textContent = 'Error';
+            document.getElementById('result-subtitle').textContent = 'Something went wrong';
+            document.getElementById('result').innerHTML = `<div class="error">${message}</div>`;
+            document.getElementById('interactive-features').style.display = 'none';
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+            
+            if (!file) return;
+
+            document.getElementById('file-name').textContent = file.name;
+            document.getElementById('welcome-screen').style.display = 'none';
+            document.getElementById('loading').classList.add('show');
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/upload_and_extract', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loading').classList.remove('show');
+                
+                if (data.error) {
+                    showError(data.error);
+                } else if (data.text) {
+                    document.getElementById('question').value = data.text;
+                    alert('Math questions extracted! Choose an action.');
+                }
+            })
+            .catch(error => {
+                document.getElementById('loading').classList.remove('show');
+                showError('Upload failed: ' + error.message);
+            });
+        }
+
+        // Enter key to solve
+        document.getElementById('question').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                e.preventDefault();
+                submitQuestion('solve');
+            }
+        });
+    </script>
+</body>
+</html>
