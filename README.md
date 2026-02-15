@@ -1,6 +1,6 @@
 # 🧮 MathSolver Pro: Advanced AI-Powered Math Learning Platform
 
-🔗 **Live Demo:** [MathSolver Pro on Render](https://aiagent-math-gemini-7997.onrender.com/)  
+🔗 **Live Demo:** [MathSolver Pro on Render](https://solmath-oxp8.onrender.com/)  
 📜 **Description:** MathSolver Pro is a comprehensive AI-powered mathematics learning platform that helps students master math through multiple learning approaches. Built with **Flask** and powered by **Groq's LLaMA 3.1**, it offers 12+ unique features including problem solving, step-by-step explanations, practice generation, real-world applications, and interactive visualizations.
 
 ---
