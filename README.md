@@ -208,16 +208,6 @@ Calculate the mean of: 12, 18, 24, 30, 36
 
 ---
 
-## 📞 Support & Troubleshooting
-
-**Common Issues:**
-
-- **"API key missing"** → Re-enter key on homepage
-- **No visualization** → Only shows for relevant problems
-- **File upload fails** → Check format (PDF/DOCX/PPTX only)
-
----
-
 ## 🤝 Contributing
 
 Contributions welcome! Open issues or submit PRs on GitHub.
